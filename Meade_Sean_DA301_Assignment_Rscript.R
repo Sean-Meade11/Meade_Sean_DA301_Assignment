@@ -223,8 +223,9 @@ dim(df_s_p)
 qplot(Product,sum_EU, data=df_s_p)
 qplot(Product,sum_NA, data=df_s_p)`
 qplot(Product,sum_global, data=df_s_p)
-
-
+qplot(sum_global,sum_EU, data=df_s_p)
+qplot(sum_global,sum_NA, data=df_s_p)
+qplot(sum_EU,sum_NA, data=df_s_p)
 qplot(y=sum_global, data=df_s_p)
 qplot(y=sum_NA, data=df_s_p)
 qplot(y=sum_EU, data=df_s_p)
@@ -236,6 +237,9 @@ qplot(sum_EU, data=df_s_p)
 qplot(sum_NA, data=df_s_p)
 
 # Create boxplots.
+qplot(sum_global, Platform, data=df_s_p_p)
+qplot(sum_NA, Platform, data=df_s_p_p)
+qplot(sum_EU, Platform, data=df_s_p_p)
 qplot(sum_global, Product, data=df_s_p, geom='boxplot')
 qplot(sum_EU, Product, data=df_s_p, geom='boxplot')
 qplot(sum_NA, Product, data=df_s_p, geom='boxplot')
@@ -278,24 +282,10 @@ shapiro.test(df_s_p$sum_global)
 # Skewness and Kurtosis.
 
 
-
-
-
-
-qqnorm(df_s_p_p$sum_EU,
-       col='blue',
-       xlab="z Value",
-       ylab='sales EU')
-
-qqnorm(df_s_p_p$sum_NA,
-       col='blue',
-       xlab="z Value",
-       ylab='sales NA')
-
-
 # Specify the skewness and kurtosis functions.
 skewness(df_s_p$sum_global)
 kurtosis(df_s_p$sum_global)
+
 
 ## 3a) Create Q-Q Plots
 # Create Q-Q Plots.
@@ -327,6 +317,8 @@ shapiro.test(df_s_p$sum_EU)
 # Specify the skewness and kurtosis functions.
 skewness(df_s_p$sum_EU)
 kurtosis(df_s_p$sum_EU)
+
+
 
 ## 3a) Create Q-Q Plots
 # Create Q-Q Plots.
@@ -362,19 +354,21 @@ kurtosis(df_s_p$sum_NA)
 
 
 
+
+
+## 3d) Determine correlation
+# Determine correlation.
 # Run a Shapiro-Wilk test.
 shapiro.test(df_s_p$sum_NA)
 shapiro.test(df_s_p$sum_EU)
 shapiro.test(df_s_p$sum_global)
 
-## 3d) Determine correlation
-# Determine correlation.
-
 # Specify the cor function.
 # Set the first and second variables.
 
 cor(df_s_p$sum_global, df_s_p$sum_EU)
-cor(df_s_p$sum_global, df_s_p$sum_NA) 
+cor(df_s_p$sum_global, df_s_p$sum_NA)
+cor(df_s_p$sum_EU, df_s_p$sum_NA)
 
 # Determine the correlation for the whole data frame.
 round (cor(df_s_p),
@@ -389,10 +383,75 @@ round (cor(df_s_p),
 
 # 4. Plot the data
 # Create plots to gain insights into data.
-ggplot(df_s,
-       mapping=aes(x=Product, y=Sales_EU)) +
-  geom_point()
 
+library(ggplot2)
+###############################################################################
+
+#Create visualisations
+
+
+
+
+# 4a) Plot Sales on a histogram.
+ggplot(df_s_p_p, aes(x=sum_EU)) +
+  geom_histogram(stat='count',
+                 fill='blue')
+
+
+####
+
+# 4c) Plot Sales and Platform on a stacked barplot.
+ggplot(df_s_p_p, aes(x=sum_EU,  fill=Platform)) +
+  geom_bar()
+
+
+####
+
+# 4d) Plot Sales and Platform on a grouped barplot.
+#ggplot(df_s_p_p, aes(x=sum_EU,  fill=platform)) +
+#  geom_bar(position='dodge')
+
+
+####
+
+# 4e) Plot Sales and Product on a side-by-side boxplot.
+ggplot(data = df_s,
+       mapping=aes(x=Product, y="EU Sales")) +
+  geom_boxplot()
+
+
+####
+
+# 4f) Plot Sales and Product on a side-by-side violinplot.
+ggplot(data = df_s, aes(x=Product, y=Platform)) +
+  geom_violin(fill='orange')
+
+
+####
+
+# 4h) Plot Sales and Product on a side-by-side boxplot.
+#ggplot(data = df_s, aes(x=smoker, y=bmi)) +
+#  geom_boxplot(fill='purple')
+
+
+
+
+ggplot(data = df_s,
+       mapping=aes(x=Product, y=Sales_EU)) +
+  
+  geom_point(color = 'red',
+             # Set the alpha transparency to 0.5.
+             alpha = 0.5,  
+             # Set the point size to 1.5.
+             size = 1.5) +
+  geom_smooth(method = 'lm',
+            se = FALSE,
+            size = 1.5) +
+  # Add a scale layer for x.
+  scale_x_continuous(breaks = seq(0, 90, 5)) +  
+  
+  # Add a scale layer for y.
+  scale_y_continuous(breaks = seq(0, 350, 50))
 
 # Choose the type of plot you think best suits the data set and what you want 
 # to investigate. Explain your answer in your report.
@@ -425,7 +484,12 @@ ggplot(df_s,
 # Instructions
 # 1. Load and explore the data.
 ##  - Continue to use the data frame that you prepared in the Week 5 assignment. 
+
 # 2. Create a simple linear regression model.
+
+# Create a linear regression model.
+# View the summary stats.
+# Create a visualisation to determine normality of data set.
 ##  - Determine the correlation between the sales columns.
 ##  - View the output.
 ##  - Create plots to view the linear regression.
@@ -446,28 +510,48 @@ ggplot(df_s,
 
 # 1. Load and explor the data
 # View data frame created in Week 5.
+View(df_s_p)
+View(df_s_p_p)
 
 
 # Determine a summary of the data frame.
-
-
+summary(df_s_p)
+summary(df_s_p_p)
 ###############################################################################
 
 # 2. Create a simple linear regression model
 ## 2a) Determine the correlation between columns
+
+
+round (cor(df_s_p),
+       digits=2)
 # Create a linear regression model on the original data.
 
-
+model2 <- lm(Product~sum_EU+sum_NA+sum_global, data=df_s_p)
+summary(model2)
 
 ## 2b) Create a plot (simple linear regression)
 # Basic visualisation.
 
+qqnorm(residuals(model2))
+qqline(residuals(model2), col='red')
 
 ###############################################################################
 
 # 3. Create a multiple linear regression model
 # Select only numeric columns from the original data frame.
+modelEU <- lm(sum_EU~sum_NA+sum_global, data=df_s_p)
+summary(modelEU)
+modelNA <- lm(sum_NA~sum_EU+sum_global, data=df_s_p)
+summary(modelNA)
 
+## 2b) Create a plot (simple linear regression)
+# Basic visualisation.
+
+qqnorm(residuals(modelEU))
+qqline(residuals(modelEU), col='red')
+qqnorm(residuals(modelNA))
+qqline(residuals(modelNA), col='red')
 
 # Multiple linear regression model.
 
@@ -476,6 +560,31 @@ ggplot(df_s,
 
 # 4. Predictions based on given values
 # Compare with observed values for a number of records.
+
+# Creating a data frame
+Predict_a <- data.frame(sum_EU = c(23.80), sum_NA =c(34.02), sum_global=c(63.3))
+Predict_b <- data.frame(sum_EU = c(1.56), sum_NA =c(3.93), sum_global=c(6))
+Predict_c <- data.frame(sum_EU = c(0.65), sum_NA =c(2.73), sum_global=c(5))
+Predict_d <- data.frame(sum_EU = c(0.97), sum_NA =c(2.26), sum_global=c(4))
+Predict_e <- data.frame(sum_EU = c(0.52), sum_NA =c(22.08), sum_global=c(26))
+# Predicts the future values
+
+# a) NA_Sales_sum of 34.02 and EU_Sales_sum of 23.80.
+predict(modelEU, newdata = Predict_a, interval = 'confidence')
+predict(modelNA, newdata = Predict_a, interval = 'confidence')
+# b) NA_Sales_sum of 3.93 and EU_Sales_sum of 1.56.
+predict(modelEU, newdata = Predict_b, interval = 'confidence')
+predict(modelNA, newdata = Predict_b, interval = 'confidence')
+# c) NA_Sales_sum of 2.73 and EU_Sales_sum of 0.65.
+predict(modelEU, newdata = Predict_c, interval = 'confidence')
+predict(modelNA, newdata = Predict_c, interval = 'confidence')
+# d) NA_Sales_sum of 2.26 and EU_Sales_sum of 0.97.
+predict(modelEU, newdata = Predict_d, interval = 'confidence')
+predict(modelNA, newdata = Predict_d, interval = 'confidence')
+# e) NA_Sales_sum of 22.08 and EU_Sales_sum of 0.52.
+predict(modelEU, newdata = Predict_e, interval = 'confidence')
+predict(modelNA, newdata = Predict_e, interval = 'confidence')
+
 
 
 ###############################################################################
